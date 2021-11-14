@@ -7,11 +7,5 @@ export default defineConfig({
     chunkSizeWarningLimit: 100000000,
     cssCodeSplit: false,
     brotliSize: false,
-    rollupOptions: {
-      inlineDynamicImports: true,
-      output: {
-        manualChunks: () => 'everything.js',
-      },
-    },
   },
 })
