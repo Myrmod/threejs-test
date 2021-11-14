@@ -127,15 +127,15 @@ export default class XRScene {
     this.render()
   }
 
-  private onMouseDown() {
+  private onMouseDown = () => {
     this.mouseDown = true
   }
 
-  private onMouseUp() {
+  private onMouseUp = () => {
     this.mouseDown = false
   }
 
-  private onWindowResize() {
+  private onWindowResize = () => {
     try {
       this.camera.aspect = window.innerWidth / window.innerHeight
       this.camera.updateProjectionMatrix()
@@ -148,7 +148,7 @@ export default class XRScene {
     }
   }
 
-  private render() {
+  private render = () => {
     try {
       this.renderer.render(this.scene, this.camera)
     } catch (error) {
@@ -156,7 +156,7 @@ export default class XRScene {
     }
   }
 
-  private onMouseMove(e: MouseEvent) {
+  private onMouseMove = (e: MouseEvent) => {
     try {
       e.preventDefault()
 
@@ -180,7 +180,7 @@ export default class XRScene {
     }
   }
 
-  public hoveredObject() {
+  public hoveredObject = () => {
     return {
       object: this.intersectedObject,
       mouseDown: this.mouseDown,
