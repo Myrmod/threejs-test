@@ -1,6 +1,8 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import Configuration from './interfaces'
+import chessboardUrl from './assets/models/chessboard.glb?url'
 
 export default class XRScene {
   private mouseDown = false
@@ -13,6 +15,7 @@ export default class XRScene {
   private controls: OrbitControls
   private light: THREE.HemisphereLight
   protected config: Configuration
+  group: THREE.Group
 
   private initializeRenderer() {
     const renderer = new THREE.WebGLRenderer({
@@ -101,18 +104,37 @@ export default class XRScene {
     this.scene = this.initializeScene()
     this.controls = this.initializeControls()
 
-    const group = new THREE.Group()
+    this.group = new THREE.Group()
 
-    const material = new THREE.ShaderMaterial({
-      depthWrite: false,
-      side: THREE.BackSide,
+    // red cube
+    // const material = new THREE.ShaderMaterial({
+    //   depthWrite: false,
+    //   side: THREE.BackSide,
+    // })
+    // const mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), material)
+    // group.add(mesh)
+    // this.scene.add(group)
+    // this.camera.lookAt(group.position)
+
+    // .glb model
+    const objLoader = new GLTFLoader()
+    objLoader.load(chessboardUrl, gltf => {
+      this.group = gltf.scene
+      // console.log(gltf)
+
+      this.group.position.set(0, 0, 0)
+      this.scene.add(this.group)
     })
-    const mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), material)
+    this.camera.position.set(
+      this.group.position.x,
+      this.group.position.y + 5,
+      this.group.position.z,
+    )
+    this.camera.translateY(100)
+    this.camera.lookAt(this.group.position)
 
-    group.add(mesh)
-    this.scene.add(group)
-
-    this.camera.lookAt(group.position)
+    // const grid = new THREE.GridHelper(25, 25)
+    // this.scene.add(grid)
 
     // enable hovering of cursor
     this.raycaster = new THREE.Raycaster()
@@ -120,7 +142,7 @@ export default class XRScene {
 
     // events
     window.addEventListener('resize', this.onWindowResize)
-    // this.renderer.domElement.addEventListener('mousemove', this.onMouseMove)
+    this.renderer.domElement.addEventListener('mousemove', this.onMouseMove)
     this.renderer.domElement.addEventListener('mousedown', this.onMouseDown)
     this.renderer.domElement.addEventListener('mouseup', this.onMouseUp)
 
