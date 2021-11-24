@@ -69,8 +69,6 @@ export default class XRScene {
   private initializeControls() {
     const controls = new OrbitControls(this.camera, this.renderer.domElement)
     controls.addEventListener('change', this.render) // use only if there is no animation loop
-    controls.minDistance = 1
-    controls.maxDistance = 10
     controls.enablePan = false
 
     return controls
@@ -149,7 +147,60 @@ export default class XRScene {
       this.renderer.domElement.addEventListener('mousemove', this.onMouseMove)
       this.renderer.domElement.addEventListener('mousedown', this.onMouseDown)
       this.renderer.domElement.addEventListener('mouseup', this.onMouseUp)
+      window.addEventListener('keydown', this.handleKeypress)
     })
+  }
+
+  private moveCamera = (direction: 'forward' | 'right' | 'backward' | 'left', speed = 1) => {
+    const facingDir = this.camera.getWorldDirection(new THREE.Vector3())
+
+    switch (direction) {
+      case 'forward':
+        this.camera.position.addScaledVector(facingDir, speed)
+        break
+      case 'right':
+        break
+      case 'backward':
+        this.camera.position.addScaledVector(facingDir, -1 * speed)
+        break
+      case 'left':
+        break
+
+      default:
+        break
+    }
+    this.camera.updateProjectionMatrix()
+    this.render()
+  }
+
+  private handleKeypress = (e: KeyboardEvent) => {
+    switch (e.code) {
+      case 'KeyW':
+      case 'ArrowUp':
+        this.moveCamera('forward')
+
+        break
+
+      case 'KeyA':
+      case 'ArrowLeft':
+        this.moveCamera('left')
+
+        break
+
+      case 'KeyD':
+      case 'ArrowRight':
+        this.moveCamera('right')
+
+        break
+
+      case 'KeyS':
+      case 'ArrowDown':
+        this.moveCamera('backward')
+        break
+
+      default:
+        break
+    }
   }
 
   private onMouseDown = () => {
@@ -175,8 +226,6 @@ export default class XRScene {
 
   private render = () => {
     try {
-      console.log(this.camera.position)
-
       this.renderer.render(this.scene, this.camera)
     } catch (error) {
       console.error(error)
