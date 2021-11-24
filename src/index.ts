@@ -95,6 +95,18 @@ export default class XRScene {
     return light
   }
 
+  private async initializeObject(callback?: () => void) {
+    const objLoader = new GLTFLoader()
+    const gltf = await objLoader.loadAsync(chessboardUrl)
+    this.group = gltf.scene
+    console.log(gltf)
+
+    this.group.position.set(0, 0, 0)
+    this.scene.add(this.group)
+
+    if (callback) callback()
+  }
+
   constructor(config: Configuration) {
     this.config = config
 
@@ -117,36 +129,27 @@ export default class XRScene {
     // this.camera.lookAt(group.position)
 
     // .glb model
-    const objLoader = new GLTFLoader()
-    objLoader.load(chessboardUrl, gltf => {
-      this.group = gltf.scene
-      // console.log(gltf)
+    this.initializeObject(() => {
+      this.camera.position.set(
+        this.group.position.x,
+        this.group.position.y + 50,
+        this.group.position.z,
+      )
+      this.camera.lookAt(this.group.position)
+      // const grid = new THREE.GridHelper(25, 25)
+      // this.scene.add(grid)
 
-      this.group.position.set(0, 0, 0)
-      this.scene.add(this.group)
+      // enable hovering of cursor
+      this.raycaster = new THREE.Raycaster()
+      this.cursor = new THREE.Vector2()
+
+      this.render()
+      // events
+      window.addEventListener('resize', this.onWindowResize)
+      this.renderer.domElement.addEventListener('mousemove', this.onMouseMove)
+      this.renderer.domElement.addEventListener('mousedown', this.onMouseDown)
+      this.renderer.domElement.addEventListener('mouseup', this.onMouseUp)
     })
-    this.camera.position.set(
-      this.group.position.x,
-      this.group.position.y + 5,
-      this.group.position.z,
-    )
-    this.camera.translateY(100)
-    this.camera.lookAt(this.group.position)
-
-    // const grid = new THREE.GridHelper(25, 25)
-    // this.scene.add(grid)
-
-    // enable hovering of cursor
-    this.raycaster = new THREE.Raycaster()
-    this.cursor = new THREE.Vector2()
-
-    // events
-    window.addEventListener('resize', this.onWindowResize)
-    this.renderer.domElement.addEventListener('mousemove', this.onMouseMove)
-    this.renderer.domElement.addEventListener('mousedown', this.onMouseDown)
-    this.renderer.domElement.addEventListener('mouseup', this.onMouseUp)
-
-    this.render()
   }
 
   private onMouseDown = () => {
@@ -172,6 +175,8 @@ export default class XRScene {
 
   private render = () => {
     try {
+      console.log(this.camera.position)
+
       this.renderer.render(this.scene, this.camera)
     } catch (error) {
       console.error(error)
