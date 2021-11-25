@@ -3,6 +3,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import Configuration from './interfaces'
 import chessboardUrl from './assets/models/chessboard.glb?url'
+import calcOrthogonalVector from './helper/calculateOrthogonalVector'
 
 export default class XRScene {
   private mouseDown = false
@@ -159,11 +160,14 @@ export default class XRScene {
         this.camera.position.addScaledVector(facingDir, speed)
         break
       case 'right':
+        this.camera.position.addScaledVector(calcOrthogonalVector(this.camera), -1 * speed)
+
         break
       case 'backward':
         this.camera.position.addScaledVector(facingDir, -1 * speed)
         break
       case 'left':
+        this.camera.position.addScaledVector(calcOrthogonalVector(this.camera), speed)
         break
 
       default:
